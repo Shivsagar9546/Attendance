@@ -21,19 +21,26 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-36 build-tools;36.0.0-rc4'
 
       - name: Setup Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 9.3.1
 
-      - name: Prepare Keystore and Environment
+      - name: Generate Keystore and Environment Files
         run: |
           mkdir -p ~/.android
           if [ -f debug.keystore.base64 ]; then
-            base64 -d debug.keystore.base64 > debug.keystore
-            cp debug.keystore ~/.android/debug.keystore || true
+            base64 -d debug.keystore.base64 > debug.keystore || true
           fi
+          if [ ! -f debug.keystore ]; then
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          cp debug.keystore ~/.android/debug.keystore || true
+          touch secrets.properties
+          touch local.properties
           touch .env
           echo "MAPS_API_KEY=" > .env
 
