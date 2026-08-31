@@ -22,10 +22,10 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 9.3.1
+      - name: Generate Gradle Wrapper
+        run: |
+          gradle wrapper --gradle-version 8.11.1 || true
+          chmod +x ./gradlew || true
 
       - name: Prepare Keystore and Environment
         run: |
@@ -38,7 +38,7 @@ jobs:
           echo "MAPS_API_KEY=" > .env
 
       - name: Build APK with Gradle
-        run: gradle :app:assembleDebug --stacktrace --no-daemon
+        run: ./gradlew :app:assembleDebug --no-daemon --no-configuration-cache
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
