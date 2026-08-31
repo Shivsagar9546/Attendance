@@ -29,23 +29,18 @@ jobs:
         with:
           gradle-version: 9.3.1
 
-      - name: Generate Keystore and Environment Files
+      - name: Prepare Debug Keystore & Secrets
         run: |
           mkdir -p ~/.android
-          if [ -f debug.keystore.base64 ]; then
-            base64 -d debug.keystore.base64 > debug.keystore || true
-          fi
-          if [ ! -f debug.keystore ]; then
-            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-          fi
-          cp debug.keystore ~/.android/debug.keystore || true
-          touch secrets.properties
-          touch local.properties
+          keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          cp debug.keystore ~/.android/debug.keystore
           touch .env
-          echo "MAPS_API_KEY=" > .env
+          touch .env.example
+          touch local.properties
+          touch secrets.properties
 
       - name: Build APK with Gradle
-        run: gradle :app:assembleDebug --no-daemon --no-configuration-cache --stacktrace
+        run: gradle :app:assembleDebug -Dorg.gradle.configuration-cache=false -Dksp.useKSP2=true -Dkotlin.compiler.execution.strategy=in-process --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
