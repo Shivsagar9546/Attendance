@@ -1,0 +1,6 @@
+{
+  "name": "Attendance & OT Calculator",
+  "description": "Production-grade offline attendance register, overtime tracker, and salary calculator for factory workers, staff, and supervisors.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
